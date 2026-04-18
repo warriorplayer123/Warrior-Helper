@@ -7,6 +7,11 @@
         "position": "center",
         "color": "blue",
         "availableColors": ["green", "blue", "red", "info", "text"],
+        "icons": {
+            "soon": "icon_skills.stormstrength_1_tex",
+            "active": "icon_skills.turningforce_tex",
+            "ta2": "icon_skills.stormstrength_2_tex"
+        },
         "dungeonEvent": {
             "version": 2,
             "type": 43,
@@ -29,7 +34,7 @@
         "abnormalityId": 101300,
         "iconSkillId": 281030,
         "durationMs": 27000,
-        "endingSoonMs": 3000
+        "endingSoonMs": 5000
     },
     "abnormalities": {
         "deadlyGamble": [100800, 100801, 100811, 100812],
@@ -68,12 +73,12 @@
         "tempestAuraIILabel": "Tempest Aura II warning",
         "tempestAuraStatus": "Tempest Aura",
         "deadlyGambleStart": "Deadly Gamble started. Counting Scythe and Aerial Scythe.",
-        "tempestAuraSoon": "[TA] SOON",
-        "tempestAuraActive": "[TA] ACTIVE",
-        "tempestAuraIIActive": "[TA II] ACTIVE",
-        "tempestAuraIIEnding": "[TA II] 3 SEC",
+        "tempestAuraSoon": "SOON",
+        "tempestAuraActive": "ACTIVE",
+        "tempestAuraIIActive": "ACTIVE",
+        "tempestAuraIIEnding": "3 SEC",
         "traverseCutLabel": "Traverse Cut warning",
-        "tcEnding": "3 SEC",
+        "tcEnding": "5 SEC",
         "reset": "Warrior Helper counters reset.",
         "aerialLabel": "AERIAL",
         "scytheLabel": "SCYTHE"

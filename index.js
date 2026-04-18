@@ -401,7 +401,7 @@ module.exports = function WarriorHelper(mod) {
         if (isTaEnabled() && !tempestAuraWarned && tempestAuraStacks >= config.thresholds.tempestAuraSoon) {
             tempestAuraWarned = true;
             tempestAuraWarnedAt = Date.now();
-            sendTempestAuraNotice(config.messages.tempestAuraSoon);
+            sendTempestAuraNotice(config.messages.tempestAuraSoon, getTempestAuraSoonIcon());
         }
     }
 
@@ -418,7 +418,7 @@ module.exports = function WarriorHelper(mod) {
 
         tempestAuraActiveTimeout = mod.setTimeout(() => {
             tempestAuraActiveTimeout = null;
-            sendTempestAuraNotice(config.messages.tempestAuraActive);
+            sendTempestAuraNotice(config.messages.tempestAuraActive, getTempestAuraActiveIcon());
         }, delay);
     }
 
@@ -437,7 +437,7 @@ module.exports = function WarriorHelper(mod) {
 
         if (isBegin && !ta2ActiveNoticeSent) {
             ta2ActiveNoticeSent = true;
-            sendTempestAuraNotice(config.messages.tempestAuraIIActive);
+            sendTempestAuraNotice(config.messages.tempestAuraIIActive, getTempestAuraIIIcon());
             scheduleTa2ThreeSecNotice();
         }
     }
@@ -463,7 +463,7 @@ module.exports = function WarriorHelper(mod) {
             }
 
             ta2ThreeSecNoticeSent = true;
-            sendTempestAuraNotice(config.messages.tempestAuraIIEnding);
+            sendTempestAuraNotice(config.messages.tempestAuraIIEnding, getTempestAuraIIIcon());
         }, delay);
     }
 
@@ -678,6 +678,24 @@ module.exports = function WarriorHelper(mod) {
         }
 
         return skillIcons.get(skillId) || skillIcons.get(getSkillBase(skillId)) || null;
+    }
+
+    function getTempestAuraSoonIcon() {
+        return getTempestAuraNoticeIcon("soon");
+    }
+
+    function getTempestAuraActiveIcon() {
+        return getTempestAuraNoticeIcon("active");
+    }
+
+    function getTempestAuraIIIcon() {
+        return getTempestAuraNoticeIcon("ta2");
+    }
+
+    function getTempestAuraNoticeIcon(key) {
+        const icons = config.tempestAuraNotice && config.tempestAuraNotice.icons;
+        const icon = icons && icons[key];
+        return typeof icon === "string" && icon.length > 0 ? icon : null;
     }
 
     function loadSkillIcons() {
