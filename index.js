@@ -90,6 +90,36 @@ module.exports = function WarriorHelper(mod) {
                 mod.command.message(`${config.messages.tempestAuraIILabel} ${isTa2Enabled() ? "enabled" : "disabled"}.`);
             }
         },
+        resets: {
+            on() {
+                mod.settings.resetsEnabled = true;
+                persistSettings();
+                mod.command.message(`Reset notices ${getResetStatusLabel()}.`);
+            },
+            off() {
+                mod.settings.resetsEnabled = false;
+                persistSettings();
+                mod.command.message(`Reset notices ${getResetStatusLabel()}.`);
+            },
+            status() {
+                mod.command.message(`Reset notices ${getResetStatusLabel()}.`);
+            }
+        },
+        rs: {
+            on() {
+                mod.settings.resetsEnabled = true;
+                persistSettings();
+                mod.command.message(`Reset notices ${getResetStatusLabel()}.`);
+            },
+            off() {
+                mod.settings.resetsEnabled = false;
+                persistSettings();
+                mod.command.message(`Reset notices ${getResetStatusLabel()}.`);
+            },
+            status() {
+                mod.command.message(`Reset notices ${getResetStatusLabel()}.`);
+            }
+        },
         ta2debug: {
             on() {
                 ta2Debug = true;
@@ -219,7 +249,7 @@ module.exports = function WarriorHelper(mod) {
         }
     });
 
-    if (!resetModuleBlocked) {
+    if (!resetModuleBlocked && isResetEnabled()) {
         mod.hook("S_CREST_MESSAGE", 2, { filter: { fake: null } }, event => {
             if (!isWarrior() || event.type !== config.skillReset.type) return;
 
@@ -262,7 +292,7 @@ module.exports = function WarriorHelper(mod) {
     }
 
     function reportQuickStatus() {
-        mod.command.message(`WH: DG ${enabled ? "ON" : "OFF"} | TA ${isTaEnabled() ? "ON" : "OFF"} | TA2 ${isTa2Enabled() ? "ON" : "OFF"} | Color: ${getTempestAuraColor()}`);
+        mod.command.message(`WH: DG ${enabled ? "ON" : "OFF"} | TA ${isTaEnabled() ? "ON" : "OFF"} | TA2 ${isTa2Enabled() ? "ON" : "OFF"} | RST ${getResetStatusShort()} | Color: ${getTempestAuraColor()}`);
     }
 
     function reportStatus() {
@@ -271,14 +301,14 @@ module.exports = function WarriorHelper(mod) {
             `Buff active: ${deadlyGambleActive ? "yes" : "no"}.`,
             `Current buff: Scythe ${current.Scythe}, Aerial Scythe ${current["Aerial Scythe"]}.`,
             `Session total: Scythe ${total.Scythe}, Aerial Scythe ${total["Aerial Scythe"]}.`,
-            `${config.messages.tempestAuraStatus}: ${tempestAuraStacks} stack(s), cycle ${tempestAuraCycleActive ? "active" : "idle"}, warning ${isTaEnabled() ? "enabled" : "disabled"}, TA II ${isTa2Enabled() ? "enabled" : "disabled"}, color ${getTempestAuraColor()}.`
+            `${config.messages.tempestAuraStatus}: ${tempestAuraStacks} stack(s), cycle ${tempestAuraCycleActive ? "active" : "idle"}, warning ${isTaEnabled() ? "enabled" : "disabled"}, TA II ${isTa2Enabled() ? "enabled" : "disabled"}, resets ${getResetStatusLabel()}, color ${getTempestAuraColor()}.`
         ].join(" "));
     }
 
     function showHelp() {
         mod.command.message([
             `WH: DG ${enabled ? "ON" : "OFF"} | TA ${isTaEnabled() ? "ON" : "OFF"} | TA2 ${isTa2Enabled() ? "ON" : "OFF"}`,
-            "whelper on/off | ta on/off | ta2 on/off",
+            "whelper on/off | ta on/off | ta2 on/off | resets/rs on/off",
             "whelper status | stats | reset",
             "whelper ta2debug on/off",
             `whelper colors | color <name> (${config.tempestAuraNotice.availableColors.join(", ")})`
@@ -396,6 +426,26 @@ module.exports = function WarriorHelper(mod) {
 
     function isTa2Enabled() {
         return mod.settings.ta2Enabled === true;
+    }
+
+    function isResetEnabled() {
+        return mod.settings.resetsEnabled !== false;
+    }
+
+    function getResetStatusShort() {
+        if (resetModuleBlocked) {
+            return "EXT";
+        }
+
+        return isResetEnabled() ? "ON" : "OFF";
+    }
+
+    function getResetStatusLabel() {
+        if (resetModuleBlocked) {
+            return `disabled by ${config.skillReset.externalModuleName}`;
+        }
+
+        return isResetEnabled() ? "enabled" : "disabled";
     }
 
     function formatOverlaySummary() {

@@ -1,5 +1,6 @@
 const DefaultSettings = {
     enabled: true,
+    resetsEnabled: true,
     tempestAuraColor: "blue",
     taEnabled: true,
     ta2Enabled: false
