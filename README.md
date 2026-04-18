@@ -162,3 +162,14 @@ Includes automatic migration system
 * Works only for **Warrior class** 
 * Designed for real-time combat feedback
 * Edge cases may still exist (especially TA2 detection)
+
+---
+
+## 🙏 Credits
+
+The original skill reset module author:
+https://github.com/eemj/skill-resets
+
+This module is partially based on and inspired by their implementation of skill reset notifications.
+
+**jkq** for the TERA guide module and for making it possible to adapt and integrate reset notifications into this module.
