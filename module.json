@@ -2,6 +2,9 @@
     "name": "Warrior-Helper",
     "author": "syndaesia",
     "description": "Warrior helper with Deadly Gamble scythe counting and Tempest Aura warning.",
+    "servers": [
+        "https://raw.githubusercontent.com/warriorplayer123/Warrior-Helper/main/"
+    ],
     "options": {
         "settingsVersion": 2,
         "settingsFile": "settings.json",
@@ -10,4 +13,3 @@
         "guiName": "Warrior Helper"
     }
 }
-
