@@ -56,14 +56,19 @@ AERIAL: X / SCYTHE: Y
 
 ### ⚔️ Traverse Cut (TC)
 
-* Tracks Traverse Cut buff via abnormality or skill trigger
+* Tracks Traverse Cut buff via abnormality
 * Shows **3-second warning before buff ends**
+* Includes skill icon in notification
 
 ```
 [TC] 3 SEC
 ```
 
-* Handles duration automatically (fallback + normalization) 
+**Duration handling:**
+
+* Uses real in-game buff duration when available
+* Falls back to config value if needed
+* Automatically normalizes different packet formats 
 
 ---
 
@@ -143,8 +148,6 @@ Available:
 green, blue, red, info, text
 ```
 
-
-
 ---
 
 ## ⚙️ Configuration
@@ -170,7 +173,13 @@ config.json
 }
 ```
 
+You can customize:
 
+* TA thresholds and timing
+* TA2 duration & warning timing
+* TC fallback duration
+* Messages and colors
+* Buff / skill IDs
 
 ---
 
@@ -189,15 +198,16 @@ Supports:
 * TA / TA2 / TC toggles
 * Custom message color
 
-Default values defined via migrator 
+Default values defined via migrator
 
 ---
 
 ## ⚠️ Notes
 
-* Works only for **Warrior class** 
+* Works only for **Warrior class**
 * Designed for real-time combat feedback
-* Includes internal fallback logic for timing and durations
+* Uses in-game packet data whenever possible
+* Includes fallback logic for missing or inconsistent data
 * Edge cases may still exist (especially TA2 / TC detection)
 
 ---
