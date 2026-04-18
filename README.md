@@ -39,7 +39,7 @@ AERIAL: X / SCYTHE: Y
 [TA] ACTIVE
 ```
 
-* Smart logic prevents false triggers and spam 
+* Smart logic prevents false triggers and spam
 
 ---
 
@@ -54,7 +54,7 @@ AERIAL: X / SCYTHE: Y
 [TA II] 3 SEC
 ```
 
-* Timing is configurable (default: 10s duration, 3s warning) 
+* Timing is configurable (default: 10s duration, 3s warning)
 
 ---
 
@@ -92,6 +92,23 @@ AERIAL: X / SCYTHE: Y
 
 ---
 
+### 🔁 Skill Reset Controls
+
+| Command                 | Description                          |
+| ----------------------- | ------------------------------------ |
+| `whelper resets on/off` | Enable / Disable reset notifications |
+| `whelper resets status` | Show reset status                    |
+| `whelper rs on/off`     | Short alias for reset toggle         |
+| `whelper rs status`     | Short alias for reset status         |
+
+**Status indicators:**
+
+* `ON` → reset notifications active
+* `OFF` → disabled manually
+* `EXT` → disabled due to external module
+
+---
+
 ### 🎨 Visual Settings
 
 | Command                | Description             |
@@ -104,8 +121,6 @@ Available colors:
 ```
 green, blue, red, info, text
 ```
-
-
 
 ---
 
@@ -151,15 +166,16 @@ Supports:
 
 * Enable/disable module
 * TA / TA2 toggles
+* Reset notifications toggle
 * Custom message color
 
-Includes automatic migration system 
+Includes automatic migration system
 
 ---
 
 ## ⚠️ Notes
 
-* Works only for **Warrior class** 
+* Works only for **Warrior class**
 * Designed for real-time combat feedback
 * Edge cases may still exist (especially TA2 detection)
 
