@@ -1,0 +1,73 @@
+{
+    "playerClass": "warrior",
+    "damageType": 1,
+    "noticeChatChannel": 21,
+    "tempestAuraNotice": {
+        "useCustomStyle": true,
+        "position": "center",
+        "color": "blue",
+        "availableColors": ["green", "blue", "red", "info", "text"],
+        "dungeonEvent": {
+            "version": 2,
+            "type": 43,
+            "chat": 0,
+            "channel": 27
+        },
+        "customStyle": {
+            "style": 51,
+            "fontSize": 29,
+            "fontColor": "#00FFFF"
+        }
+    },
+    "thresholds": {
+        "tempestAuraSoon": 40,
+        "tempestAuraActiveDelayMs": 1200,
+        "ta2DurationMs": 10000,
+        "ta2EndingSoonMs": 3000
+    },
+    "abnormalities": {
+        "deadlyGamble": [100800, 100801, 100811, 100812],
+        "tempestAuraBuildup": [103120, 103131],
+        "tempestAuraActive": [103130]
+    },
+    "skills": {
+        "scythe": [380100, 380130],
+        "aerialScythe": [410131]
+    },
+    "skillReset": {
+        "disableWhenExternalModulePresent": true,
+        "externalModuleName": "skill-resets",
+        "type": 6,
+        "warnTimeoutMs": 15,
+        "showSystemMessage": false,
+        "style": 51,
+        "text": "Reset",
+        "font": {
+            "size": 24,
+            "color": "#FF4500"
+        },
+        "icon": {
+            "width": 48,
+            "height": 48,
+            "vspace": -20
+        },
+        "sound": {
+            "enabled": false,
+            "id": 3028
+        }
+    },
+    "messages": {
+        "deadlyGambleLabel": "Deadly Gamble counter",
+        "tempestAuraLabel": "Tempest Aura warning",
+        "tempestAuraIILabel": "Tempest Aura II warning",
+        "tempestAuraStatus": "Tempest Aura",
+        "deadlyGambleStart": "Deadly Gamble started. Counting Scythe and Aerial Scythe.",
+        "tempestAuraSoon": "[TA] SOON",
+        "tempestAuraActive": "[TA] ACTIVE",
+        "tempestAuraIIActive": "[TA II] ACTIVE",
+        "tempestAuraIIEnding": "[TA II] 3 SEC",
+        "reset": "Warrior Helper counters reset.",
+        "aerialLabel": "AERIAL",
+        "scytheLabel": "SCYTHE"
+    }
+}

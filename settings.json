@@ -1,0 +1,9 @@
+{
+    "version": 2,
+    "data": {
+        "enabled": true,
+        "tempestAuraColor": "info",
+        "taEnabled": true,
+        "ta2Enabled": true
+    }
+}

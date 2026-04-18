@@ -1,0 +1,13 @@
+{
+    "name": "Warrior-Helper",
+    "author": "syndaesia",
+    "description": "Warrior helper with Deadly Gamble scythe counting and Tempest Aura warning.",
+    "options": {
+        "settingsVersion": 2,
+        "settingsFile": "settings.json",
+        "settingsMigrator": "settings_migrator.js",
+        "cliName": "Warrior Helper",
+        "guiName": "Warrior Helper"
+    }
+}
+
