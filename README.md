@@ -1,7 +1,7 @@
 # ⚔️ Warrior Helper
 
 > Advanced Warrior utility module
-> Includes **Skill Reset notifications**, **Deadly Gamble tracking**, and **Tempest Aura (I & II) alerts**
+> Includes **Skill Reset notifications**, **Deadly Gamble tracking**, **Tempest Aura (I & II)** and **Traverse Cut alerts**
 
 ---
 
@@ -10,16 +10,16 @@
 ### 🔁 Skill Reset Notifications
 
 * Visual alert when skills reset (icon + styled text)
-* Optional sound support
 * Anti-spam protection
-* Automatically disables itself if external reset module is detected
+* Can be toggled in-game
+* Automatically disabled if external reset module is detected
 
 ---
 
 ### 🗡️ Deadly Gamble Counter
 
 * Tracks **Scythe** and **Aerial Scythe** hits during Deadly Gamble
-* Shows result after buff ends
+* Displays result after buff ends
 * Keeps session totals
 
 ```
@@ -28,33 +28,42 @@ AERIAL: X / SCYTHE: Y
 
 ---
 
-### 🌪️ Tempest Aura (TA) Tracking
+### 🌪️ Tempest Aura (TA)
 
 * Tracks stack buildup (0 → 50)
 * Warns when aura is about to activate
-* Delayed "ACTIVE" notification for better timing accuracy
+* Delayed **ACTIVE** notification for better timing
 
 ```
 [TA] SOON
 [TA] ACTIVE
 ```
 
-* Smart logic prevents false triggers and spam
-
 ---
 
-### ⚡ Tempest Aura II (TA2) Alerts
+### ⚡ Tempest Aura II (TA2)
 
-* Detects TA2 activation during Deadly Gamble
+* Detects activation during Deadly Gamble
 * Shows activation notice
-* Shows **“3 seconds remaining”** warning before it ends
+* Shows **3-second warning before expiration**
 
 ```
 [TA II] ACTIVE
 [TA II] 3 SEC
 ```
 
-* Timing is configurable (default: 10s duration, 3s warning)
+---
+
+### ⚔️ Traverse Cut (TC)
+
+* Tracks Traverse Cut buff via abnormality or skill trigger
+* Shows **3-second warning before buff ends**
+
+```
+[TC] 3 SEC
+```
+
+* Handles duration automatically (fallback + normalization) 
 
 ---
 
@@ -62,50 +71,62 @@ AERIAL: X / SCYTHE: Y
 
 ### 🔧 Main
 
-| Command          | Description      |
-| ---------------- | ---------------- |
-| `whelper`        | Toggle module    |
-| `whelper on/off` | Enable / Disable |
-| `whelper status` | Quick status     |
-| `whelper stats`  | Detailed stats   |
-| `whelper reset`  | Reset counters   |
-| `whelper help`   | Show help        |
+| Command          | Description        |
+| ---------------- | ------------------ |
+| `whelper`        | Toggle module      |
+| `whelper on/off` | Enable / Disable   |
+| `whelper status` | Quick status       |
+| `whelper stats`  | Detailed stats     |
+| `whelper reset`  | Reset all counters |
+| `whelper help`   | Show help          |
 
 ---
 
 ### 🌪️ Tempest Aura
 
-| Command             | Description                  |
-| ------------------- | ---------------------------- |
-| `whelper ta on/off` | Enable / Disable TA warnings |
-| `whelper ta status` | Show TA status               |
+| Command             | Description      |
+| ------------------- | ---------------- |
+| `whelper ta`        | Toggle TA        |
+| `whelper ta on/off` | Enable / Disable |
+| `whelper ta status` | Show status      |
 
 ---
 
 ### ⚡ Tempest Aura II
 
-| Command                   | Description                 |
-| ------------------------- | --------------------------- |
-| `whelper ta2 on/off`      | Enable / Disable TA2 alerts |
-| `whelper ta2 status`      | Show TA2 status             |
-| `whelper ta2debug on/off` | Debug TA2 packets           |
+| Command              | Description      |
+| -------------------- | ---------------- |
+| `whelper ta2`        | Toggle TA2       |
+| `whelper ta2 on/off` | Enable / Disable |
+| `whelper ta2 status` | Show status      |
+
+---
+
+### ⚔️ Traverse Cut
+
+| Command             | Description      |
+| ------------------- | ---------------- |
+| `whelper tc`        | Toggle TC        |
+| `whelper tc on/off` | Enable / Disable |
+| `whelper tc status` | Show status      |
 
 ---
 
 ### 🔁 Skill Reset Controls
 
-| Command                 | Description                          |
-| ----------------------- | ------------------------------------ |
-| `whelper resets on/off` | Enable / Disable reset notifications |
-| `whelper resets status` | Show reset status                    |
-| `whelper rs on/off`     | Short alias for reset toggle         |
-| `whelper rs status`     | Short alias for reset status         |
+| Command                 | Description            |
+| ----------------------- | ---------------------- |
+| `whelper resets`        | Toggle reset notices   |
+| `whelper resets on/off` | Enable / Disable       |
+| `whelper resets status` | Show status            |
+| `whelper rs`            | Short alias (toggle)   |
+| `whelper rs on/off`     | Alias enable / disable |
 
 **Status indicators:**
 
-* `ON` → reset notifications active
-* `OFF` → disabled manually
-* `EXT` → disabled due to external module
+* `ON` → enabled
+* `OFF` → disabled
+* `EXT` → disabled by external module
 
 ---
 
@@ -116,23 +137,25 @@ AERIAL: X / SCYTHE: Y
 | `whelper colors`       | Show available colors   |
 | `whelper color <name>` | Change TA message color |
 
-Available colors:
+Available:
 
 ```
 green, blue, red, info, text
 ```
 
+
+
 ---
 
 ## ⚙️ Configuration
 
-Main config file:
+Main file:
 
 ```
 config.json
 ```
 
-### Key options:
+### Key settings:
 
 ```json
 "thresholds": {
@@ -140,17 +163,14 @@ config.json
   "tempestAuraActiveDelayMs": 1200,
   "ta2DurationMs": 10000,
   "ta2EndingSoonMs": 3000
+},
+"traverseCut": {
+  "durationMs": 27000,
+  "endingSoonMs": 3000
 }
 ```
 
-You can customize:
 
-* TA warning threshold
-* TA activation delay
-* TA2 timing
-* Message text
-* Colors & styles
-* Skill / buff IDs
 
 ---
 
@@ -164,28 +184,29 @@ settings.json
 
 Supports:
 
-* Enable/disable module
-* TA / TA2 toggles
-* Reset notifications toggle
+* Module enable/disable
+* Reset toggle
+* TA / TA2 / TC toggles
 * Custom message color
 
-Includes automatic migration system
+Default values defined via migrator 
 
 ---
 
 ## ⚠️ Notes
 
-* Works only for **Warrior class**
+* Works only for **Warrior class** 
 * Designed for real-time combat feedback
-* Edge cases may still exist (especially TA2 detection)
+* Includes internal fallback logic for timing and durations
+* Edge cases may still exist (especially TA2 / TC detection)
 
 ---
 
 ## 🙏 Credits
 
-The original skill reset module author:
+Original skill reset module:
 https://github.com/eemj/skill-resets
 
-This module is partially based on and inspired by their implementation of skill reset notifications.
+This module is partially based on and inspired by their implementation.
 
-**jkq** for the TERA guide module and for making it possible to adapt and integrate reset notifications into this module.
+**jkq** for the TERA guide module and for enabling adaptation of reset notifications.
