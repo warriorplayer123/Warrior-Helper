@@ -183,9 +183,7 @@ module.exports = function WarriorHelper(mod) {
     });
 
     mod.game.on("leave_game", resetState);
-    if (!resetModuleBlocked) {
-        mod.game.on("enter_game", loadSkillIcons);
-    }
+    mod.game.on("enter_game", loadSkillIcons);
 
     mod.hook("S_ABNORMALITY_BEGIN", mod.majorPatchVersion <= 106 ? 4 : 5, { filter: { fake: null } }, event => {
         if (!isMe(event.target)) return;
@@ -262,7 +260,7 @@ module.exports = function WarriorHelper(mod) {
             if (activeBuffs.size === 0 && deadlyGambleActive) {
                 deadlyGambleActive = false;
                 lastCounted = createLastCounted();
-                sendNotice(formatOverlaySummary());
+                sendSummaryNotice(formatOverlaySummary());
                 resetTa2();
             }
             return;
@@ -501,7 +499,7 @@ module.exports = function WarriorHelper(mod) {
                 return;
             }
 
-            sendTempestAuraNotice(config.messages.tcEnding);
+            sendTempestAuraNotice(config.messages.tcEnding, getTraverseCutIcon());
         }, delay);
     }
 
@@ -593,12 +591,22 @@ module.exports = function WarriorHelper(mod) {
         });
     }
 
-    function sendTempestAuraNotice(message) {
+    function sendSummaryNotice(message) {
+        mod.send("S_CUSTOM_STYLE_SYSTEM_MESSAGE", 1, {
+            message: `<font size="${config.tempestAuraNotice.customStyle.fontSize}" color="${getTempestAuraTextColor()}">${escapeHtml(message)}</font>`,
+            style: config.tempestAuraNotice.customStyle.style
+        });
+    }
+
+    function sendTempestAuraNotice(message, icon) {
         const safeMessage = escapeHtml(message);
+        const iconMarkup = icon
+            ? `<img src="img://__${icon}" width="${config.skillReset.icon.width}" height="${config.skillReset.icon.height}" vspace="${config.skillReset.icon.vspace}"/>&nbsp;`
+            : "";
 
         if (config.tempestAuraNotice.useCustomStyle) {
             mod.send("S_CUSTOM_STYLE_SYSTEM_MESSAGE", 1, {
-                message: `<font size="${config.tempestAuraNotice.customStyle.fontSize}" color="${getTempestAuraTextColor()}">${safeMessage}</font>`,
+                message: `${iconMarkup}<font size="${config.tempestAuraNotice.customStyle.fontSize}" color="${getTempestAuraTextColor()}">${safeMessage}</font>`,
                 style: config.tempestAuraNotice.customStyle.style
             });
             return;
@@ -661,6 +669,15 @@ module.exports = function WarriorHelper(mod) {
             message: `<img src="img://__${icon}" width="${config.skillReset.icon.width}" height="${config.skillReset.icon.height}" vspace="${config.skillReset.icon.vspace}"/><font size="${config.skillReset.font.size}" color="${config.skillReset.font.color}">&nbsp;${config.skillReset.text}</font>`,
             style: config.skillReset.style
         });
+    }
+
+    function getTraverseCutIcon() {
+        const skillId = Number(config.traverseCut && config.traverseCut.iconSkillId);
+        if (!Number.isFinite(skillId) || skillId <= 0) {
+            return null;
+        }
+
+        return skillIcons.get(skillId) || skillIcons.get(getSkillBase(skillId)) || null;
     }
 
     function loadSkillIcons() {

@@ -27,6 +27,7 @@
     },
     "traverseCut": {
         "abnormalityId": 101300,
+        "iconSkillId": 281030,
         "durationMs": 27000,
         "endingSoonMs": 3000
     },
@@ -72,7 +73,7 @@
         "tempestAuraIIActive": "[TA II] ACTIVE",
         "tempestAuraIIEnding": "[TA II] 3 SEC",
         "traverseCutLabel": "Traverse Cut warning",
-        "tcEnding": "[TC] 3 SEC",
+        "tcEnding": "3 SEC",
         "reset": "Warrior Helper counters reset.",
         "aerialLabel": "AERIAL",
         "scytheLabel": "SCYTHE"
