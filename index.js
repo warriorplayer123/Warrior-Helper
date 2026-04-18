@@ -179,6 +179,20 @@ module.exports = function WarriorHelper(mod) {
         },
         colors() {
             mod.command.message(`Available Tempest Aura colors: ${config.tempestAuraNotice.availableColors.join(", ")}. Current: ${getTempestAuraColor()}.`);
+        },
+        scythecolor(value) {
+            const nextColor = normalizeTempestAuraColor(value);
+            if (!nextColor) {
+                mod.command.message(`Invalid color. Available: ${config.tempestAuraNotice.availableColors.join(", ")}.`);
+                return;
+            }
+
+            mod.settings.summaryColor = nextColor;
+            persistSettings();
+            mod.command.message(`Scythe summary color set to ${nextColor}.`);
+        },
+        scythecolors() {
+            mod.command.message(`Available Scythe summary colors: ${config.tempestAuraNotice.availableColors.join(", ")}. Current: ${getSummaryColor()}.`);
         }
     });
 
@@ -339,7 +353,7 @@ module.exports = function WarriorHelper(mod) {
     }
 
     function reportQuickStatus() {
-        mod.command.message(`WH: DG ${enabled ? "ON" : "OFF"} | TA ${isTaEnabled() ? "ON" : "OFF"} | TA2 ${isTa2Enabled() ? "ON" : "OFF"} | TC ${isTcEnabled() ? "ON" : "OFF"} | RST ${getResetStatusShort()} | Color: ${getTempestAuraColor()}`);
+        mod.command.message(`WH: DG ${enabled ? "ON" : "OFF"} | TA ${isTaEnabled() ? "ON" : "OFF"} | TA2 ${isTa2Enabled() ? "ON" : "OFF"} | TC ${isTcEnabled() ? "ON" : "OFF"} | RST ${getResetStatusShort()} | Color: ${getTempestAuraColor()} | Scythe: ${getSummaryColor()}`);
     }
 
     function reportStatus() {
@@ -348,7 +362,7 @@ module.exports = function WarriorHelper(mod) {
             `Buff active: ${deadlyGambleActive ? "yes" : "no"}.`,
             `Current buff: Scythe ${current.Scythe}, Aerial Scythe ${current["Aerial Scythe"]}.`,
             `Session total: Scythe ${total.Scythe}, Aerial Scythe ${total["Aerial Scythe"]}.`,
-            `${config.messages.tempestAuraStatus}: ${tempestAuraStacks} stack(s), cycle ${tempestAuraCycleActive ? "active" : "idle"}, warning ${isTaEnabled() ? "enabled" : "disabled"}, TA II ${isTa2Enabled() ? "enabled" : "disabled"}, TC ${isTcEnabled() ? "enabled" : "disabled"}, resets ${getResetStatusLabel()}, color ${getTempestAuraColor()}.`
+            `${config.messages.tempestAuraStatus}: ${tempestAuraStacks} stack(s), cycle ${tempestAuraCycleActive ? "active" : "idle"}, warning ${isTaEnabled() ? "enabled" : "disabled"}, TA II ${isTa2Enabled() ? "enabled" : "disabled"}, TC ${isTcEnabled() ? "enabled" : "disabled"}, resets ${getResetStatusLabel()}, color ${getTempestAuraColor()}, scythe color ${getSummaryColor()}.`
         ].join(" "));
     }
 
@@ -357,7 +371,7 @@ module.exports = function WarriorHelper(mod) {
             `WH: DG ${enabled ? "ON" : "OFF"} | TA ${isTaEnabled() ? "ON" : "OFF"} | TA2 ${isTa2Enabled() ? "ON" : "OFF"} | TC ${isTcEnabled() ? "ON" : "OFF"}`,
             "whelper on/off | ta on/off | ta2 on/off | tc on/off | resets/rs on/off",
             "whelper status | stats | reset",
-            `whelper colors | color <name> (${config.tempestAuraNotice.availableColors.join(", ")})`
+            `whelper colors | color <name> | scythecolors | scythecolor <name> (${config.tempestAuraNotice.availableColors.join(", ")})`
         ].join("\n"));
     }
 
@@ -593,7 +607,7 @@ module.exports = function WarriorHelper(mod) {
 
     function sendSummaryNotice(message) {
         mod.send("S_CUSTOM_STYLE_SYSTEM_MESSAGE", 1, {
-            message: `<font size="${config.tempestAuraNotice.customStyle.fontSize}" color="${getTempestAuraTextColor()}">${escapeHtml(message)}</font>`,
+            message: `<font size="${config.tempestAuraNotice.customStyle.fontSize}" color="${getSummaryTextColor()}">${escapeHtml(message)}</font>`,
             style: config.tempestAuraNotice.customStyle.style
         });
     }
@@ -642,6 +656,10 @@ module.exports = function WarriorHelper(mod) {
         return normalizeTempestAuraColor(mod.settings.tempestAuraColor) || normalizeTempestAuraColor(config.tempestAuraNotice.color) || "blue";
     }
 
+    function getSummaryColor() {
+        return normalizeTempestAuraColor(mod.settings.summaryColor) || "text";
+    }
+
     function normalizeTempestAuraColor(value) {
         const color = String(value || "").toLowerCase();
         return config.tempestAuraNotice.availableColors.includes(color) ? color : null;
@@ -661,6 +679,23 @@ module.exports = function WarriorHelper(mod) {
                 return "#FFFFFF";
             default:
                 return config.tempestAuraNotice.customStyle.fontColor;
+        }
+    }
+
+    function getSummaryTextColor() {
+        switch (getSummaryColor()) {
+            case "green":
+                return "#00FF00";
+            case "blue":
+                return "#00FFFF";
+            case "red":
+                return "#FF4500";
+            case "info":
+                return "#4DA6FF";
+            case "text":
+                return "#FFFFFF";
+            default:
+                return "#FFFFFF";
         }
     }
 

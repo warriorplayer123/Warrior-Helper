@@ -2,6 +2,7 @@ const DefaultSettings = {
     enabled: true,
     resetsEnabled: true,
     tempestAuraColor: "blue",
+    summaryColor: "text",
     taEnabled: true,
     ta2Enabled: false,
     tcEnabled: true

@@ -2,7 +2,7 @@
     "version": 4,
     "data": {
         "enabled": true,
-        "resetsEnabled": true,
+        "resetsEnabled": false,
         "tempestAuraColor": "info",
         "taEnabled": true,
         "ta2Enabled": true,
