@@ -25,6 +25,11 @@
         "ta2DurationMs": 10000,
         "ta2EndingSoonMs": 3000
     },
+    "traverseCut": {
+        "abnormalityId": 101300,
+        "durationMs": 27000,
+        "endingSoonMs": 3000
+    },
     "abnormalities": {
         "deadlyGamble": [100800, 100801, 100811, 100812],
         "tempestAuraBuildup": [103120, 103131],
@@ -66,6 +71,8 @@
         "tempestAuraActive": "[TA] ACTIVE",
         "tempestAuraIIActive": "[TA II] ACTIVE",
         "tempestAuraIIEnding": "[TA II] 3 SEC",
+        "traverseCutLabel": "Traverse Cut warning",
+        "tcEnding": "[TC] 3 SEC",
         "reset": "Warrior Helper counters reset.",
         "aerialLabel": "AERIAL",
         "scytheLabel": "SCYTHE"

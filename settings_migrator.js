@@ -3,7 +3,8 @@ const DefaultSettings = {
     resetsEnabled: true,
     tempestAuraColor: "blue",
     taEnabled: true,
-    ta2Enabled: false
+    ta2Enabled: false,
+    tcEnabled: true
 };
 
 module.exports = function MigrateSettings(from_ver, to_ver, settings) {

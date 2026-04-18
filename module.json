@@ -6,7 +6,7 @@
         "https://raw.githubusercontent.com/warriorplayer123/Warrior-Helper/main/"
     ],
     "options": {
-        "settingsVersion": 3,
+        "settingsVersion": 4,
         "settingsFile": "settings.json",
         "settingsMigrator": "settings_migrator.js",
         "cliName": "Warrior Helper",

@@ -5,6 +5,7 @@ const config = require("./config.json");
 const DEADLY_GAMBLE_BUFF_IDS = new Set(config.abnormalities.deadlyGamble);
 const TEMPEST_AURA_BUILDUP_IDS = new Set(config.abnormalities.tempestAuraBuildup);
 const TEMPEST_AURA_ACTIVE_IDS = new Set(config.abnormalities.tempestAuraActive);
+const TRAVERSE_CUT_ABNORMALITY_ID = Number(config.traverseCut && config.traverseCut.abnormalityId);
 const SKILL_IDS = {
     SCYTHE: new Set(config.skills.scythe),
     AERIAL_SCYTHE: new Set(config.skills.aerialScythe)
@@ -28,7 +29,8 @@ module.exports = function WarriorHelper(mod) {
     let ta2ActiveNoticeSent = false;
     let ta2ThreeSecNoticeSent = false;
     let ta2ThreeSecTimeout = null;
-    let ta2Debug = false;
+    let tcThreeSecTimeout = null;
+    let lastTcTriggerAt = 0;
     let lastReset = { time: 0, icon: null };
     let skillIcons = new Map();
 
@@ -61,6 +63,11 @@ module.exports = function WarriorHelper(mod) {
             setEnabled(false);
         },
         ta: {
+            $none() {
+                mod.settings.taEnabled = !isTaEnabled();
+                persistSettings();
+                mod.command.message(`${config.messages.tempestAuraLabel} ${isTaEnabled() ? "enabled" : "disabled"}.`);
+            },
             on() {
                 mod.settings.taEnabled = true;
                 persistSettings();
@@ -76,6 +83,11 @@ module.exports = function WarriorHelper(mod) {
             }
         },
         ta2: {
+            $none() {
+                mod.settings.ta2Enabled = !isTa2Enabled();
+                persistSettings();
+                mod.command.message(`${config.messages.tempestAuraIILabel} ${isTa2Enabled() ? "enabled" : "disabled"}.`);
+            },
             on() {
                 mod.settings.ta2Enabled = true;
                 persistSettings();
@@ -90,7 +102,36 @@ module.exports = function WarriorHelper(mod) {
                 mod.command.message(`${config.messages.tempestAuraIILabel} ${isTa2Enabled() ? "enabled" : "disabled"}.`);
             }
         },
+        tc: {
+            $none() {
+                mod.settings.tcEnabled = !isTcEnabled();
+                persistSettings();
+                if (!isTcEnabled()) {
+                    clearTcNotice();
+                }
+                mod.command.message(`${config.messages.traverseCutLabel} ${isTcEnabled() ? "enabled" : "disabled"}.`);
+            },
+            on() {
+                mod.settings.tcEnabled = true;
+                persistSettings();
+                mod.command.message(`${config.messages.traverseCutLabel} enabled.`);
+            },
+            off() {
+                mod.settings.tcEnabled = false;
+                persistSettings();
+                clearTcNotice();
+                mod.command.message(`${config.messages.traverseCutLabel} disabled.`);
+            },
+            status() {
+                mod.command.message(`${config.messages.traverseCutLabel} ${isTcEnabled() ? "enabled" : "disabled"}.`);
+            }
+        },
         resets: {
+            $none() {
+                mod.settings.resetsEnabled = !isResetEnabled();
+                persistSettings();
+                mod.command.message(`Reset notices ${getResetStatusLabel()}.`);
+            },
             on() {
                 mod.settings.resetsEnabled = true;
                 persistSettings();
@@ -106,6 +147,11 @@ module.exports = function WarriorHelper(mod) {
             }
         },
         rs: {
+            $none() {
+                mod.settings.resetsEnabled = !isResetEnabled();
+                persistSettings();
+                mod.command.message(`Reset notices ${getResetStatusLabel()}.`);
+            },
             on() {
                 mod.settings.resetsEnabled = true;
                 persistSettings();
@@ -118,16 +164,6 @@ module.exports = function WarriorHelper(mod) {
             },
             status() {
                 mod.command.message(`Reset notices ${getResetStatusLabel()}.`);
-            }
-        },
-        ta2debug: {
-            on() {
-                ta2Debug = true;
-                mod.command.message("TA II packet debug enabled.");
-            },
-            off() {
-                ta2Debug = false;
-                mod.command.message("TA II packet debug disabled.");
             }
         },
         color(value) {
@@ -164,7 +200,6 @@ module.exports = function WarriorHelper(mod) {
                 mod.command.message(config.messages.deadlyGambleStart);
             }
 
-            logTa2Packet("BEGIN", event);
             handleTa2Buff(event.duration, true);
 
             return;
@@ -173,6 +208,11 @@ module.exports = function WarriorHelper(mod) {
         if (TEMPEST_AURA_BUILDUP_IDS.has(event.id)) {
             tempestAuraCycleActive = true;
             updateTempestAuraStacks(event.id, event.stacks);
+            return;
+        }
+
+        if (isTraverseCutAbnormality(event.id)) {
+            handleTraverseCutAbnormality(event);
             return;
         }
 
@@ -190,7 +230,6 @@ module.exports = function WarriorHelper(mod) {
 
         if (DEADLY_GAMBLE_BUFF_IDS.has(event.id)) {
             activeBuffs.add(event.id);
-            logTa2Packet("REFRESH", event);
             handleTa2Buff(event.duration, false);
             return;
         }
@@ -198,6 +237,11 @@ module.exports = function WarriorHelper(mod) {
         if (TEMPEST_AURA_BUILDUP_IDS.has(event.id)) {
             tempestAuraCycleActive = true;
             updateTempestAuraStacks(event.id, event.stacks);
+            return;
+        }
+
+        if (isTraverseCutAbnormality(event.id)) {
+            handleTraverseCutAbnormality(event);
             return;
         }
 
@@ -214,7 +258,6 @@ module.exports = function WarriorHelper(mod) {
         if (!isMe(event.target)) return;
 
         if (DEADLY_GAMBLE_BUFF_IDS.has(event.id)) {
-            logTa2Packet("END", event);
             activeBuffs.delete(event.id);
             if (activeBuffs.size === 0 && deadlyGambleActive) {
                 deadlyGambleActive = false;
@@ -226,6 +269,11 @@ module.exports = function WarriorHelper(mod) {
         }
 
         if (TEMPEST_AURA_BUILDUP_IDS.has(event.id)) {
+            return;
+        }
+
+        if (isTraverseCutAbnormality(event.id)) {
+            clearTcNotice();
             return;
         }
 
@@ -249,8 +297,9 @@ module.exports = function WarriorHelper(mod) {
         }
     });
 
-    if (!resetModuleBlocked && isResetEnabled()) {
+    if (!resetModuleBlocked) {
         mod.hook("S_CREST_MESSAGE", 2, { filter: { fake: null } }, event => {
+            if (!isResetEnabled()) return;
             if (!isWarrior() || event.type !== config.skillReset.type) return;
 
             const skill = Number(event.skill);
@@ -292,7 +341,7 @@ module.exports = function WarriorHelper(mod) {
     }
 
     function reportQuickStatus() {
-        mod.command.message(`WH: DG ${enabled ? "ON" : "OFF"} | TA ${isTaEnabled() ? "ON" : "OFF"} | TA2 ${isTa2Enabled() ? "ON" : "OFF"} | RST ${getResetStatusShort()} | Color: ${getTempestAuraColor()}`);
+        mod.command.message(`WH: DG ${enabled ? "ON" : "OFF"} | TA ${isTaEnabled() ? "ON" : "OFF"} | TA2 ${isTa2Enabled() ? "ON" : "OFF"} | TC ${isTcEnabled() ? "ON" : "OFF"} | RST ${getResetStatusShort()} | Color: ${getTempestAuraColor()}`);
     }
 
     function reportStatus() {
@@ -301,16 +350,15 @@ module.exports = function WarriorHelper(mod) {
             `Buff active: ${deadlyGambleActive ? "yes" : "no"}.`,
             `Current buff: Scythe ${current.Scythe}, Aerial Scythe ${current["Aerial Scythe"]}.`,
             `Session total: Scythe ${total.Scythe}, Aerial Scythe ${total["Aerial Scythe"]}.`,
-            `${config.messages.tempestAuraStatus}: ${tempestAuraStacks} stack(s), cycle ${tempestAuraCycleActive ? "active" : "idle"}, warning ${isTaEnabled() ? "enabled" : "disabled"}, TA II ${isTa2Enabled() ? "enabled" : "disabled"}, resets ${getResetStatusLabel()}, color ${getTempestAuraColor()}.`
+            `${config.messages.tempestAuraStatus}: ${tempestAuraStacks} stack(s), cycle ${tempestAuraCycleActive ? "active" : "idle"}, warning ${isTaEnabled() ? "enabled" : "disabled"}, TA II ${isTa2Enabled() ? "enabled" : "disabled"}, TC ${isTcEnabled() ? "enabled" : "disabled"}, resets ${getResetStatusLabel()}, color ${getTempestAuraColor()}.`
         ].join(" "));
     }
 
     function showHelp() {
         mod.command.message([
-            `WH: DG ${enabled ? "ON" : "OFF"} | TA ${isTaEnabled() ? "ON" : "OFF"} | TA2 ${isTa2Enabled() ? "ON" : "OFF"}`,
-            "whelper on/off | ta on/off | ta2 on/off | resets/rs on/off",
+            `WH: DG ${enabled ? "ON" : "OFF"} | TA ${isTaEnabled() ? "ON" : "OFF"} | TA2 ${isTa2Enabled() ? "ON" : "OFF"} | TC ${isTcEnabled() ? "ON" : "OFF"}`,
+            "whelper on/off | ta on/off | ta2 on/off | tc on/off | resets/rs on/off",
             "whelper status | stats | reset",
-            "whelper ta2debug on/off",
             `whelper colors | color <name> (${config.tempestAuraNotice.availableColors.join(", ")})`
         ].join("\n"));
     }
@@ -324,6 +372,7 @@ module.exports = function WarriorHelper(mod) {
         lastReset = { time: 0, icon: null };
         skillIcons.clear();
         resetTa2();
+        clearTcNotice();
     }
 
     function resetTempestAura(cancelActiveNotice = true) {
@@ -420,12 +469,76 @@ module.exports = function WarriorHelper(mod) {
         }, delay);
     }
 
+    function isTraverseCutAbnormality(id) {
+        return Number(id) === TRAVERSE_CUT_ABNORMALITY_ID;
+    }
+
+    function handleTraverseCutAbnormality(event) {
+        if (!isTcEnabled() || !isTraverseCutAbnormality(event.id)) {
+            return;
+        }
+
+        const totalMs = normalizeDurationMs(event.duration, Number(config.traverseCut.durationMs) || 27000);
+        const now = Date.now();
+        if (tcThreeSecTimeout && now - lastTcTriggerAt < 250) {
+            return;
+        }
+
+        lastTcTriggerAt = now;
+        scheduleTcThreeSecNotice(totalMs);
+    }
+
+    function scheduleTcThreeSecNotice(totalMs) {
+        clearTcNotice();
+
+        const safeTotalMs = Math.max(0, Number(totalMs) || Number(config.traverseCut.durationMs) || 27000);
+        const leadMs = Number(config.traverseCut.endingSoonMs) || 3000;
+        const delay = Math.max(0, safeTotalMs - leadMs);
+
+        tcThreeSecTimeout = mod.setTimeout(() => {
+            tcThreeSecTimeout = null;
+            if (!isTcEnabled()) {
+                return;
+            }
+
+            sendTempestAuraNotice(config.messages.tcEnding);
+        }, delay);
+    }
+
+    function clearTcNotice() {
+        if (tcThreeSecTimeout) {
+            mod.clearTimeout(tcThreeSecTimeout);
+            tcThreeSecTimeout = null;
+        }
+    }
+
+    function normalizeDurationMs(duration, fallbackMs) {
+        const numeric = Number(duration);
+        if (!Number.isFinite(numeric) || numeric <= 0) {
+            return fallbackMs;
+        }
+
+        if (numeric < 1000) {
+            return numeric * 1000;
+        }
+
+        if (numeric > 600000) {
+            return Math.round(numeric / 1000);
+        }
+
+        return numeric;
+    }
+
     function isTaEnabled() {
         return mod.settings.taEnabled !== false;
     }
 
     function isTa2Enabled() {
         return mod.settings.ta2Enabled === true;
+    }
+
+    function isTcEnabled() {
+        return mod.settings.tcEnabled !== false;
     }
 
     function isResetEnabled() {
@@ -450,16 +563,6 @@ module.exports = function WarriorHelper(mod) {
 
     function formatOverlaySummary() {
         return `${config.messages.aerialLabel}: ${current["Aerial Scythe"]} / ${config.messages.scytheLabel}: ${current.Scythe}`;
-    }
-
-    function logTa2Packet(type, event) {
-        if (!ta2Debug) return;
-
-        const duration = typeof event.duration === "bigint" ? event.duration.toString() : String(event.duration ?? "n/a");
-        const stacks = typeof event.stacks === "number" ? event.stacks : "n/a";
-        const msg = `[TA2DBG] ${type} id=${event.id} duration=${duration} stacks=${stacks}`;
-        mod.command.message(msg);
-        mod.log(msg);
     }
 
     function setEnabled(value) {
