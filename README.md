@@ -9,32 +9,35 @@
 
 ### 🔁 Skill Reset Notifications
 
-* Visual alert when skills reset (icon + styled text)
+* Visual alert with **skill icon + styled text**
 * Anti-spam protection
-* Can be toggled in-game
-* Automatically disabled if external reset module is detected
+* Toggle in-game (`resets` / `rs`)
+* Auto-disabled if external module is detected
 
 ---
 
 ### 🗡️ Deadly Gamble Counter
 
-* Tracks **Scythe** and **Aerial Scythe** hits during Deadly Gamble
-* Displays result after buff ends
+* Tracks **Scythe** and **Aerial Scythe** during Deadly Gamble
+* Shows styled summary when buff ends
 * Keeps session totals
 
-```
+```text
 AERIAL: X / SCYTHE: Y
 ```
+
+* Summary uses **custom color setting** (separate from TA)
 
 ---
 
 ### 🌪️ Tempest Aura (TA)
 
 * Tracks stack buildup (0 → 50)
-* Warns when aura is about to activate
-* Delayed **ACTIVE** notification for better timing
+* Sends **SOON warning** when threshold is reached
+* Sends delayed **ACTIVE notification**
+* Supports **custom color + optional icons**
 
-```
+```text
 [TA] SOON
 [TA] ACTIVE
 ```
@@ -46,8 +49,9 @@ AERIAL: X / SCYTHE: Y
 * Detects activation during Deadly Gamble
 * Shows activation notice
 * Shows **3-second warning before expiration**
+* Uses same styling system as TA
 
-```
+```text
 [TA II] ACTIVE
 [TA II] 3 SEC
 ```
@@ -56,19 +60,19 @@ AERIAL: X / SCYTHE: Y
 
 ### ⚔️ Traverse Cut (TC)
 
-* Tracks Traverse Cut buff via abnormality
-* Shows **3-second warning before buff ends**
-* Includes skill icon in notification
+* Tracks Traverse Cut via **abnormality (buff)**
+* Shows **5-second warning before expiration**
+* Supports **icon display (if configured)**
 
+```text
+[TC] 5 SEC
 ```
-[TC] 3 SEC
-```
 
-**Duration handling:**
+#### Duration handling:
 
-* Uses real in-game buff duration when available
+* Uses real **packet duration** when available
 * Falls back to config value if needed
-* Automatically normalizes different packet formats 
+* Handles ms/sec inconsistencies automatically 
 
 ---
 
@@ -119,15 +123,15 @@ AERIAL: X / SCYTHE: Y
 
 ### 🔁 Skill Reset Controls
 
-| Command                 | Description            |
-| ----------------------- | ---------------------- |
-| `whelper resets`        | Toggle reset notices   |
-| `whelper resets on/off` | Enable / Disable       |
-| `whelper resets status` | Show status            |
-| `whelper rs`            | Short alias (toggle)   |
-| `whelper rs on/off`     | Alias enable / disable |
+| Command                 | Description          |
+| ----------------------- | -------------------- |
+| `whelper resets`        | Toggle reset notices |
+| `whelper resets on/off` | Enable / Disable     |
+| `whelper resets status` | Show status          |
+| `whelper rs`            | Alias toggle         |
+| `whelper rs on/off`     | Alias enable/disable |
 
-**Status indicators:**
+**Status:**
 
 * `ON` → enabled
 * `OFF` → disabled
@@ -137,12 +141,25 @@ AERIAL: X / SCYTHE: Y
 
 ### 🎨 Visual Settings
 
-| Command                | Description             |
-| ---------------------- | ----------------------- |
-| `whelper colors`       | Show available colors   |
-| `whelper color <name>` | Change TA message color |
+#### Tempest Aura colors
 
-Available:
+| Command                | Description  |
+| ---------------------- | ------------ |
+| `whelper colors`       | Show colors  |
+| `whelper color <name>` | Set TA color |
+
+---
+
+#### Scythe Summary colors
+
+| Command                      | Description       |
+| ---------------------------- | ----------------- |
+| `whelper scythecolors`       | Show colors       |
+| `whelper scythecolor <name>` | Set summary color |
+
+---
+
+Available colors:
 
 ```
 green, blue, red, info, text
@@ -165,7 +182,7 @@ config.json
   "tempestAuraSoon": 40,
   "tempestAuraActiveDelayMs": 1200,
   "ta2DurationMs": 10000,
-  "ta2EndingSoonMs": 3000
+  "ta2EndingSoonMs": 5000
 },
 "traverseCut": {
   "durationMs": 27000,
@@ -173,42 +190,41 @@ config.json
 }
 ```
 
-You can customize:
+---
 
-* TA thresholds and timing
-* TA2 duration & warning timing
-* TC fallback duration
-* Messages and colors
+### Additional options:
+
+* TA icons (`tempestAuraNotice.icons`)
+* TC icon (`traverseCut.iconSkillId`)
+* Reset styling (icon, font, sound)
 * Buff / skill IDs
 
 ---
 
 ## 💾 Settings
 
-Stored automatically in:
+Stored in:
 
 ```
 settings.json
 ```
 
-Supports:
+Includes:
 
-* Module enable/disable
-* Reset toggle
+* Module toggle
 * TA / TA2 / TC toggles
-* Custom message color
-
-Default values defined via migrator
+* Reset toggle
+* TA color
+* Scythe summary color
 
 ---
 
 ## ⚠️ Notes
 
-* Works only for **Warrior class**
-* Designed for real-time combat feedback
-* Uses in-game packet data whenever possible
-* Includes fallback logic for missing or inconsistent data
-* Edge cases may still exist (especially TA2 / TC detection)
+* Works only for **Warrior**
+* Uses real-time packet data
+* Includes fallback logic for missing durations
+* TC / TA2 behavior depends on server packets
 
 ---
 
@@ -219,4 +235,4 @@ https://github.com/eemj/skill-resets
 
 This module is partially based on and inspired by their implementation.
 
-**jkq** for the TERA guide module and for enabling adaptation of reset notifications.
+**jkq** for the TERA guide module and enabling integration of reset notifications.
